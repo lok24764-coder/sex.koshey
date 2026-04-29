@@ -1,0 +1,15 @@
+{
+	"required": true,
+	"package": "me.koshey.hack.client.mixin",
+	"compatibilityLevel": "JAVA_25",
+	"refmap": "koshey-hack.refmap.json",
+	"client": [
+		"KeyboardMixin",
+		"ClientPlayerMixin",
+		"GuiMixin",
+		"MouseHandlerMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
