@@ -2,10 +2,8 @@ package me.koshey.hack.client.font;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.platform.NativeImage;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-// import net.minecraft.resources.ResourceLocation;
 
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -15,6 +13,7 @@ import java.awt.image.BufferedImage;
 
 public class CustomFont {
     private final Font font;
+    private final String name;
     private final CharData[] charData = new CharData[256];
     private float fontHeight = -1;
     private Object textureLocation;
@@ -22,8 +21,9 @@ public class CustomFont {
 
     private boolean initialized = false;
 
-    public CustomFont(Font font) {
+    public CustomFont(Font font, String name) {
         this.font = font;
+        this.name = name;
     }
 
     private void setup() {
@@ -65,7 +65,7 @@ public class CustomFont {
             }
         }
         
-        DynamicTexture texture = new DynamicTexture(() -> "font", nativeImage);
+        DynamicTexture texture = new DynamicTexture(() -> name, nativeImage);
         textureLocation = null;
     }
 
