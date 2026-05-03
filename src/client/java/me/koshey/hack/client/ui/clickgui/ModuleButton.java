@@ -1,7 +1,6 @@
 package me.koshey.hack.client.ui.clickgui;
 
 import me.koshey.hack.client.KosheyClient;
-import me.koshey.hack.client.font.CustomFont;
 import me.koshey.hack.client.module.Module;
 import me.koshey.hack.client.setting.BooleanSetting;
 import me.koshey.hack.client.setting.ModeSetting;

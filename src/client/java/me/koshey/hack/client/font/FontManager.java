@@ -1,6 +1,6 @@
 package me.koshey.hack.client.font;
 
-import java.awt.Font;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 public class FontManager {
@@ -9,39 +9,79 @@ public class FontManager {
     private CustomFont small;
     private CustomFont large;
 
+    private static final String MSDF_PATH = "/assets/koshey/fonts/msdf/";
+
     public FontManager() {
         try {
-            InputStream mediumStream = FontManager.class.getResourceAsStream("/assets/koshey/fonts/sf_medium.ttf");
-            if (mediumStream == null) {
-                System.out.println("Could not find sf_medium.ttf");
-            } else {
-                Font sfMedium = Font.createFont(Font.TRUETYPE_FONT, mediumStream);
-                this.medium = new CustomFont(sfMedium.deriveFont(18f), "medium");
-                this.small = new CustomFont(sfMedium.deriveFont(16f), "small");
+            MSDFData mediumData = loadJson("medium");
+            byte[] mediumPng = loadPng("medium");
+            if (mediumData != null && mediumPng != null) {
+                this.medium = new CustomFont(mediumData, mediumPng, "medium", 18f);
+                this.small = new CustomFont(mediumData, mediumPng.clone(), "small", 14f);
             }
-            
-            InputStream boldStream = FontManager.class.getResourceAsStream("/assets/koshey/fonts/sf_bold.ttf");
-            if (boldStream == null) {
-                System.out.println("Could not find sf_bold.ttf");
-            } else {
-                Font sfBold = Font.createFont(Font.TRUETYPE_FONT, boldStream);
-                this.bold = new CustomFont(sfBold.deriveFont(18f), "bold");
-                this.large = new CustomFont(sfBold.deriveFont(24f), "large");
+
+            MSDFData boldData = loadJson("bold");
+            byte[] boldPng = loadPng("bold");
+            if (boldData != null && boldPng != null) {
+                this.bold = new CustomFont(boldData, boldPng, "bold", 18f);
+                this.large = new CustomFont(boldData, boldPng.clone(), "large", 24f);
             }
-            
-            if (this.medium == null) throw new RuntimeException("Fallback to Arial");
+
+            if (this.medium == null) {
+                throw new RuntimeException("Failed to load MSDF medium font");
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            Font fallback = new Font("Arial", Font.PLAIN, 18);
-            this.medium = new CustomFont(fallback, "medium");
-            this.small = new CustomFont(fallback.deriveFont(16f), "small");
-            this.bold = new CustomFont(fallback.deriveFont(Font.BOLD, 18f), "bold");
-            this.large = new CustomFont(fallback.deriveFont(Font.BOLD, 24f), "large");
+            MSDFData fallbackData = loadJson("regular");
+            byte[] fallbackPng = loadPng("regular");
+            if (fallbackData != null && fallbackPng != null) {
+                this.medium = new CustomFont(fallbackData, fallbackPng, "medium", 18f);
+                this.small = new CustomFont(fallbackData, fallbackPng.clone(), "small", 14f);
+                this.bold = new CustomFont(fallbackData, fallbackPng.clone(), "bold", 18f);
+                this.large = new CustomFont(fallbackData, fallbackPng.clone(), "large", 24f);
+            }
+        }
+    }
+
+    private MSDFData loadJson(String name) {
+        try (InputStream stream = FontManager.class.getResourceAsStream(MSDF_PATH + name + ".json")) {
+            if (stream == null) {
+                System.err.println("[MSDF] Could not find " + name + ".json");
+                return null;
+            }
+            return MSDFData.parse(stream);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private byte[] loadPng(String name) {
+        try (InputStream stream = FontManager.class.getResourceAsStream(MSDF_PATH + name + ".png")) {
+            if (stream == null) {
+                System.err.println("[MSDF] Could not find " + name + ".png");
+                return null;
+            }
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            byte[] buf = new byte[8192];
+            int len;
+            while ((len = stream.read(buf)) != -1) {
+                baos.write(buf, 0, len);
+            }
+            return baos.toByteArray();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
     public CustomFont getFont(String name) {
-        return medium;
+        return switch (name) {
+            case "bold" -> bold;
+            case "small" -> small;
+            case "large" -> large;
+            default -> medium;
+        };
     }
 
     public CustomFont getMedium() {

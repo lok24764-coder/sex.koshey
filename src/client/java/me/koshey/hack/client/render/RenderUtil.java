@@ -1,8 +1,6 @@
 package me.koshey.hack.client.render;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 
 public class RenderUtil {
     public static void drawString(GuiGraphicsExtractor drawContext, String text, int x, int y, int color) {
